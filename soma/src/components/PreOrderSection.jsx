@@ -1,0 +1,279 @@
+import React, { useState } from 'react';
+import { Box, Typography, Container, TextField, Button, Stack } from '@mui/material';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+
+export default function FinalCTASection() {
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState('');
+  const [emailError, setEmailError] = useState('');
+
+  // Email validation function
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleEmailChange = (e) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+    
+    // Clear error when user starts typing
+    if (emailError) {
+      setEmailError('');
+    }
+    
+    // Validate email in real-time
+    if (newEmail && !validateEmail(newEmail)) {
+      setEmailError('Please enter a valid email address');
+    } else {
+      setEmailError('');
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Validate email before submission
+    if (!email) {
+      setEmailError('Please enter your email address');
+      return;
+    }
+    
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setSubmitStatus('');
+    setEmailError('');
+
+    try {
+      // GitHub Actions webhook URL - you'll need to set this up
+      const response = await fetch('https://api.github.com/repos/smritis17/soma/dispatches', {
+        method: 'POST',
+        headers: {
+          'Authorization': `token ${process.env.REACT_APP_GITHUB_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_type: 'email_signup',
+          client_payload: {
+            email: email,
+            timestamp: new Date().toISOString(),
+          }
+        })
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setEmail('');
+      } else {
+        setSubmitStatus('error');
+      }
+    } catch (error) {
+      console.error('Error submitting email:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isEmailValid = email && validateEmail(email) && !emailError;
+
+  return (
+    <Box 
+      id="join-waitlist" 
+      sx={{ 
+        py: { xs: 12, md: 16 }, 
+        background: 'linear-gradient(135deg, #25344f 0%, #1a2332 100%)',
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'radial-gradient(circle at 80% 20%, rgba(213, 184, 147, 0.1) 0%, transparent 50%)',
+          pointerEvents: 'none',
+        }
+      }}
+    >
+      {/* Floating elements */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '30%',
+          left: '10%',
+          width: 180,
+          height: 180,
+          borderRadius: '50%',
+          background: 'linear-gradient(45deg, rgba(213, 184, 147, 0.1) 0%, rgba(97, 120, 145, 0.05) 100%)',
+          filter: 'blur(35px)',
+          animation: 'float 9s ease-in-out infinite',
+          '@keyframes float': {
+            '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+            '50%': { transform: 'translateY(-25px) rotate(90deg)' },
+          }
+        }}
+      />
+      
+      <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
+        <Box sx={{ textAlign: 'center', mb: { xs: 8, md: 12 } }}>
+          <Typography 
+            variant="h3" 
+            sx={{ 
+              fontWeight: 800, 
+              mb: 4, 
+              color: 'primary.contrastText',
+              fontSize: { xs: '2.5rem', md: '3.5rem' },
+              letterSpacing: '-0.02em',
+              textShadow: '0 4px 20px rgba(0,0,0,0.3)',
+              maxWidth: '800px',
+              mx: 'auto',
+            }}
+          >
+            Be first to try SOMA —<br />
+            <Box 
+              component="span" 
+              sx={{ 
+                color: 'secondary.main',
+                fontWeight: 800,
+              }}
+            >
+              join early access.
+            </Box>
+          </Typography>
+        </Box>
+
+        <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+          <Box component="form" onSubmit={handleSubmit}>
+            <Stack 
+              direction={{ xs: 'column', sm: 'row' }} 
+              spacing={3}
+              sx={{ mb: 4 }}
+            >
+              <TextField
+                fullWidth
+                type="email"
+                placeholder="Enter your email address"
+                value={email}
+                onChange={handleEmailChange}
+                onBlur={() => {
+                  if (email && !validateEmail(email)) {
+                    setEmailError('Please enter a valid email address');
+                  }
+                }}
+                required
+                disabled={isSubmitting}
+                error={!!emailError}
+                helperText={emailError}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 3,
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(213, 184, 147, 0.2)',
+                    color: 'primary.contrastText',
+                    '& fieldset': {
+                      borderColor: 'transparent',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: 'rgba(213, 184, 147, 0.4)',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: emailError ? '#ef4444' : 'secondary.main',
+                    },
+                    '&.Mui-error fieldset': {
+                      borderColor: '#ef4444',
+                    },
+                    '& input': {
+                      color: 'primary.contrastText',
+                      '&::placeholder': {
+                        color: 'secondary.main',
+                        opacity: 0.6,
+                      },
+                    },
+                  },
+                  '& .MuiFormHelperText-root': {
+                    color: '#ef4444',
+                    marginLeft: 0,
+                    marginRight: 0,
+                  },
+                }}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                color="secondary"
+                disabled={isSubmitting || !isEmailValid}
+                endIcon={<ArrowForwardIcon />}
+                sx={{
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: 3,
+                  fontWeight: 600,
+                  minWidth: { xs: '100%', sm: 180 },
+                  boxShadow: '0 8px 32px rgba(213, 184, 147, 0.3)',
+                  '&:hover': {
+                    boxShadow: '0 12px 40px rgba(213, 184, 147, 0.4)',
+                    transform: 'translateY(-2px)',
+                  },
+                  '&:disabled': {
+                    opacity: 0.6,
+                    transform: 'none',
+                  },
+                }}
+              >
+                {isSubmitting ? 'Joining...' : 'Join Waitlist'}
+              </Button>
+            </Stack>
+          </Box>
+
+          {submitStatus === 'success' && (
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#10b981',
+                textAlign: 'center',
+                fontSize: '0.875rem',
+                mb: 2,
+              }}
+            >
+              ✓ Successfully joined the waitlist!
+            </Typography>
+          )}
+
+          {submitStatus === 'error' && (
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#ef4444',
+                textAlign: 'center',
+                fontSize: '0.875rem',
+                mb: 2,
+              }}
+            >
+              Something went wrong. Please try again.
+            </Typography>
+          )}
+
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: 'secondary.main',
+              textAlign: 'center',
+              fontSize: '0.875rem',
+              opacity: 0.7,
+            }}
+          >
+            Exclusive updates. No spam.
+          </Typography>
+        </Box>
+      </Container>
+    </Box>
+  );
+}
