@@ -4,13 +4,66 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 export default function HeroSection() {
   const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState('');
+  const [emailError, setEmailError] = useState('');
 
-  const handleSubmit = (e) => {
+  // Email validation function
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email) return;
-    // Handle email submission
-    console.log('Email submitted:', email);
-    setEmail('');
+    
+    // Validate email before submission
+    if (!email) {
+      setEmailError('Please enter your email address');
+      return;
+    }
+    
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setSubmitStatus('');
+    setEmailError('');
+
+    try {
+      // Google Apps Script web app URL - replace with your deployed web app URL
+      const GOOGLE_APPS_SCRIPT_URL = process.env.REACT_APP_GOOGLE_APPS_SCRIPT_URL || 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+      
+      const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          timestamp: new Date().toISOString(),
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSubmitStatus('success');
+        setEmail('');
+      } else {
+        setSubmitStatus('error');
+        if (result.error === 'Email already exists') {
+          setEmailError('This email is already on our waitlist');
+        }
+      }
+    } catch (error) {
+      console.error('Error submitting email:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -132,6 +185,9 @@ export default function HeroSection() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={isSubmitting}
+                error={!!emailError}
+                helperText={emailError}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 3,
@@ -145,7 +201,10 @@ export default function HeroSection() {
                       borderColor: 'rgba(213, 184, 147, 0.4)',
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: 'secondary.main',
+                      borderColor: emailError ? '#ef4444' : 'secondary.main',
+                    },
+                    '&.Mui-error fieldset': {
+                      borderColor: '#ef4444',
                     },
                     '& input': {
                       color: 'primary.contrastText',
@@ -155,12 +214,18 @@ export default function HeroSection() {
                       },
                     },
                   },
+                  '& .MuiFormHelperText-root': {
+                    color: '#ef4444',
+                    marginLeft: 0,
+                    marginRight: 0,
+                  },
                 }}
               />
               <Button
                 type="submit"
                 variant="contained"
                 color="secondary"
+                disabled={isSubmitting || !email || !validateEmail(email)}
                 endIcon={<ArrowForwardIcon />}
                 sx={{
                   px: 4,
@@ -173,12 +238,44 @@ export default function HeroSection() {
                     boxShadow: '0 12px 40px rgba(213, 184, 147, 0.4)',
                     transform: 'translateY(-2px)',
                   },
+                  '&:disabled': {
+                    opacity: 0.6,
+                    transform: 'none',
+                  },
                 }}
               >
-                Join Waitlist
+                {isSubmitting ? 'Joining...' : 'Join Waitlist'}
               </Button>
             </Stack>
           </Box>
+
+          {submitStatus === 'success' && (
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#10b981',
+                textAlign: 'center',
+                fontSize: '0.875rem',
+                mb: 2,
+              }}
+            >
+              ✓ Successfully joined the waitlist!
+            </Typography>
+          )}
+
+          {submitStatus === 'error' && (
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#ef4444',
+                textAlign: 'center',
+                fontSize: '0.875rem',
+                mb: 2,
+              }}
+            >
+              Something went wrong. Please try again.
+            </Typography>
+          )}
 
           {/* Caption */}
           <Typography 

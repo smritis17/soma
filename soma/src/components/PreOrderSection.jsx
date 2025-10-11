@@ -50,28 +50,30 @@ export default function FinalCTASection() {
     setEmailError('');
 
     try {
-      // GitHub Actions webhook URL - you'll need to set this up
-      const response = await fetch('https://api.github.com/repos/smritis17/soma/dispatches', {
+      // Google Apps Script web app URL - replace with your deployed web app URL
+      const GOOGLE_APPS_SCRIPT_URL = process.env.REACT_APP_GOOGLE_APPS_SCRIPT_URL || 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+      
+      const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
         method: 'POST',
         headers: {
-          'Authorization': `token ${process.env.REACT_APP_GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          event_type: 'email_signup',
-          client_payload: {
-            email: email,
-            timestamp: new Date().toISOString(),
-          }
+          email: email,
+          timestamp: new Date().toISOString(),
         })
       });
 
-      if (response.ok) {
+      const result = await response.json();
+
+      if (result.success) {
         setSubmitStatus('success');
         setEmail('');
       } else {
         setSubmitStatus('error');
+        if (result.error === 'Email already exists') {
+          setEmailError('This email is already on our waitlist');
+        }
       }
     } catch (error) {
       console.error('Error submitting email:', error);
