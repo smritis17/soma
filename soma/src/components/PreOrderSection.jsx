@@ -50,8 +50,8 @@ export default function FinalCTASection() {
     setEmailError('');
 
     try {
-      // Google Apps Script web app URL - uses GitHub Pages environment variable
-      const GOOGLE_APPS_SCRIPT_URL = process.env.REACT_APP_GOOGLE_APPS_SCRIPT_URL || 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+      // Google Apps Script web app URL - temporary hardcoded for immediate functionality
+      const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCWBwt42U1ivfhKqa5Sf2CocNIucqfqUryb2u0w-GiXnCp4Zd0oP53brYCicXQd52h/exec';
       
       console.log('Submitting email to:', GOOGLE_APPS_SCRIPT_URL);
       console.log('Email data:', { email, timestamp: new Date().toISOString() });
