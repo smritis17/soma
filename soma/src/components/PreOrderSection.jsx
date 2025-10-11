@@ -50,8 +50,11 @@ export default function FinalCTASection() {
     setEmailError('');
 
     try {
-      // Google Apps Script web app URL - replace with your deployed web app URL
+      // Google Apps Script web app URL - uses GitHub Pages environment variable
       const GOOGLE_APPS_SCRIPT_URL = process.env.REACT_APP_GOOGLE_APPS_SCRIPT_URL || 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+      
+      console.log('Submitting email to:', GOOGLE_APPS_SCRIPT_URL);
+      console.log('Email data:', { email, timestamp: new Date().toISOString() });
       
       const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
         method: 'POST',
@@ -64,7 +67,23 @@ export default function FinalCTASection() {
         })
       });
 
-      const result = await response.json();
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      
+      // Check if response is HTML (error page) instead of JSON
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+      
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse JSON response:', parseError);
+        console.error('Response was HTML:', responseText);
+        throw new Error('Server returned HTML instead of JSON. Check Google Apps Script deployment.');
+      }
+      
+      console.log('Response result:', result);
 
       if (result.success) {
         setSubmitStatus('success');

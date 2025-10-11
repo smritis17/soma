@@ -33,7 +33,7 @@ export default function HeroSection() {
     setEmailError('');
 
     try {
-      // Google Apps Script web app URL - replace with your deployed web app URL
+      // Google Apps Script web app URL - uses GitHub Pages environment variable
       const GOOGLE_APPS_SCRIPT_URL = process.env.REACT_APP_GOOGLE_APPS_SCRIPT_URL || 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
       
       const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
