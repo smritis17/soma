@@ -48,17 +48,19 @@ export default function HeroSection() {
       // Google Apps Script web app URL
       const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFlP6Ddp6ln91uyVvyD79X0OrMzFYtIPZ1NLxpCwVSOckFAJmJojd08lewhBq416F7/exec';
       
-      const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-        method: 'POST',
+      // Use GET request with URL parameters to avoid CORS issues
+      const params = new URLSearchParams({
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        timestamp: new Date().toISOString(),
+      });
+      
+      const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?${params}`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          timestamp: new Date().toISOString(),
-        })
+        }
       });
 
       const result = await response.json();

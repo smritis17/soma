@@ -70,17 +70,19 @@ export default function FinalCTASection() {
       console.log('Submitting data to:', GOOGLE_APPS_SCRIPT_URL);
       console.log('Form data:', { firstName, lastName, email, timestamp: new Date().toISOString() });
       
-      const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-        method: 'POST',
+      // Use GET request with URL parameters to avoid CORS issues
+      const params = new URLSearchParams({
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        timestamp: new Date().toISOString(),
+      });
+      
+      const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?${params}`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          timestamp: new Date().toISOString(),
-        })
+        }
       });
 
       console.log('Response status:', response.status);
