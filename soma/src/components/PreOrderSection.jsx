@@ -36,6 +36,8 @@ export default function FinalCTASection() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    console.log('Form submitted with:', { firstName, lastName, email });
+    
     // Validate all fields before submission
     if (!firstName) {
       setEmailError('Please enter your first name');
@@ -63,7 +65,7 @@ export default function FinalCTASection() {
 
     try {
       // Google Apps Script web app URL
-      const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNjPkm10_43X4zq4cTjm7GYTkA00NpX_T1P-4ZPFuDEQq8rhZRXBMYMq0Nxj2slKjm/exec';
+      const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFlP6Ddp6ln91uyVvyD79X0OrMzFYtIPZ1NLxpCwVSOckFAJmJojd08lewhBq416F7/exec';
       
       console.log('Submitting data to:', GOOGLE_APPS_SCRIPT_URL);
       console.log('Form data:', { firstName, lastName, email, timestamp: new Date().toISOString() });

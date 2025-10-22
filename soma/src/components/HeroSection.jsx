@@ -46,7 +46,7 @@ export default function HeroSection() {
 
     try {
       // Google Apps Script web app URL
-      const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNjPkm10_43X4zq4cTjm7GYTkA00NpX_T1P-4ZPFuDEQq8rhZRXBMYMq0Nxj2slKjm/exec';
+      const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFlP6Ddp6ln91uyVvyD79X0OrMzFYtIPZ1NLxpCwVSOckFAJmJojd08lewhBq416F7/exec';
       
       const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
         method: 'POST',
