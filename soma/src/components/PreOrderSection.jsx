@@ -3,6 +3,8 @@ import { Box, Typography, Container, TextField, Button, Stack } from '@mui/mater
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 export default function FinalCTASection() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
@@ -34,7 +36,17 @@ export default function FinalCTASection() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate email before submission
+    // Validate all fields before submission
+    if (!firstName) {
+      setEmailError('Please enter your first name');
+      return;
+    }
+    
+    if (!lastName) {
+      setEmailError('Please enter your last name');
+      return;
+    }
+    
     if (!email) {
       setEmailError('Please enter your email address');
       return;
@@ -50,11 +62,11 @@ export default function FinalCTASection() {
     setEmailError('');
 
     try {
-      // Google Apps Script web app URL - temporary hardcoded for immediate functionality
-      const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCWBwt42U1ivfhKqa5Sf2CocNIucqfqUryb2u0w-GiXnCp4Zd0oP53brYCicXQd52h/exec';
+      // Google Apps Script web app URL
+      const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNjPkm10_43X4zq4cTjm7GYTkA00NpX_T1P-4ZPFuDEQq8rhZRXBMYMq0Nxj2slKjm/exec';
       
-      console.log('Submitting email to:', GOOGLE_APPS_SCRIPT_URL);
-      console.log('Email data:', { email, timestamp: new Date().toISOString() });
+      console.log('Submitting data to:', GOOGLE_APPS_SCRIPT_URL);
+      console.log('Form data:', { firstName, lastName, email, timestamp: new Date().toISOString() });
       
       const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
         method: 'POST',
@@ -62,6 +74,8 @@ export default function FinalCTASection() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          firstName: firstName,
+          lastName: lastName,
           email: email,
           timestamp: new Date().toISOString(),
         })
@@ -87,6 +101,8 @@ export default function FinalCTASection() {
 
       if (result.success) {
         setSubmitStatus('success');
+        setFirstName('');
+        setLastName('');
         setEmail('');
       } else {
         setSubmitStatus('error');
@@ -102,7 +118,7 @@ export default function FinalCTASection() {
     }
   };
 
-  const isEmailValid = email && validateEmail(email) && !emailError;
+  const isFormValid = firstName && lastName && email && validateEmail(email) && !emailError;
 
   return (
     <Box 
@@ -174,64 +190,140 @@ export default function FinalCTASection() {
         <Box sx={{ maxWidth: 800, mx: 'auto' }}>
           <Box component="form" onSubmit={handleSubmit}>
             <Stack 
-              direction={{ xs: 'column', sm: 'row' }} 
+              direction="column" 
               spacing={3}
               sx={{ mb: 4 }}
             >
-              <TextField
-                fullWidth
-                type="email"
-                placeholder="Enter your email address"
-                value={email}
-                onChange={handleEmailChange}
-                onBlur={() => {
-                  if (email && !validateEmail(email)) {
-                    setEmailError('Please enter a valid email address');
-                  }
-                }}
-                required
-                disabled={isSubmitting}
-                error={!!emailError}
-                helperText={emailError}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 3,
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(213, 184, 147, 0.2)',
-                    color: 'primary.contrastText',
-                    '& fieldset': {
-                      borderColor: 'transparent',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'rgba(213, 184, 147, 0.4)',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: emailError ? '#ef4444' : 'secondary.main',
-                    },
-                    '&.Mui-error fieldset': {
-                      borderColor: '#ef4444',
-                    },
-                    '& input': {
+              <Stack 
+                direction={{ xs: 'column', sm: 'row' }} 
+                spacing={3}
+              >
+                <TextField
+                  fullWidth
+                  type="text"
+                  placeholder="First name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 3,
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(213, 184, 147, 0.2)',
                       color: 'primary.contrastText',
-                      '&::placeholder': {
-                        color: 'secondary.main',
-                        opacity: 0.6,
+                      '& fieldset': {
+                        borderColor: 'transparent',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgba(213, 184, 147, 0.4)',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: 'secondary.main',
+                      },
+                      '& input': {
+                        color: 'primary.contrastText',
+                        '&::placeholder': {
+                          color: 'secondary.main',
+                          opacity: 0.6,
+                        },
                       },
                     },
-                  },
-                  '& .MuiFormHelperText-root': {
-                    color: '#ef4444',
-                    marginLeft: 0,
-                    marginRight: 0,
-                  },
-                }}
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                color="secondary"
-                disabled={isSubmitting || !isEmailValid}
-                endIcon={<ArrowForwardIcon />}
+                  }}
+                />
+                <TextField
+                  fullWidth
+                  type="text"
+                  placeholder="Last name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 3,
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(213, 184, 147, 0.2)',
+                      color: 'primary.contrastText',
+                      '& fieldset': {
+                        borderColor: 'transparent',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgba(213, 184, 147, 0.4)',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: 'secondary.main',
+                      },
+                      '& input': {
+                        color: 'primary.contrastText',
+                        '&::placeholder': {
+                          color: 'secondary.main',
+                          opacity: 0.6,
+                        },
+                      },
+                    },
+                  }}
+                />
+              </Stack>
+              
+              <Stack 
+                direction={{ xs: 'column', sm: 'row' }} 
+                spacing={3}
+              >
+                <TextField
+                  fullWidth
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={handleEmailChange}
+                  onBlur={() => {
+                    if (email && !validateEmail(email)) {
+                      setEmailError('Please enter a valid email address');
+                    }
+                  }}
+                  required
+                  disabled={isSubmitting}
+                  error={!!emailError}
+                  helperText={emailError}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 3,
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(213, 184, 147, 0.2)',
+                      color: 'primary.contrastText',
+                      '& fieldset': {
+                        borderColor: 'transparent',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgba(213, 184, 147, 0.4)',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: emailError ? '#ef4444' : 'secondary.main',
+                      },
+                      '&.Mui-error fieldset': {
+                        borderColor: '#ef4444',
+                      },
+                      '& input': {
+                        color: 'primary.contrastText',
+                        '&::placeholder': {
+                          color: 'secondary.main',
+                          opacity: 0.6,
+                        },
+                      },
+                    },
+                    '& .MuiFormHelperText-root': {
+                      color: '#ef4444',
+                      marginLeft: 0,
+                      marginRight: 0,
+                    },
+                  }}
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                  disabled={isSubmitting || !firstName || !lastName || !email || !validateEmail(email)}
+                  endIcon={<ArrowForwardIcon />}
                 sx={{
                   px: 4,
                   py: 1.5,
@@ -251,6 +343,7 @@ export default function FinalCTASection() {
               >
                 {isSubmitting ? 'Joining...' : 'Join Waitlist'}
               </Button>
+              </Stack>
             </Stack>
           </Box>
 

@@ -3,6 +3,8 @@ import { Box, Container, Typography, Stack, Button, TextField } from '@mui/mater
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 export default function HeroSection() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
@@ -17,7 +19,17 @@ export default function HeroSection() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate email before submission
+    // Validate all fields before submission
+    if (!firstName) {
+      setEmailError('Please enter your first name');
+      return;
+    }
+    
+    if (!lastName) {
+      setEmailError('Please enter your last name');
+      return;
+    }
+    
     if (!email) {
       setEmailError('Please enter your email address');
       return;
@@ -33,8 +45,8 @@ export default function HeroSection() {
     setEmailError('');
 
     try {
-      // Google Apps Script web app URL - temporary hardcoded for immediate functionality
-      const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCWBwt42U1ivfhKqa5Sf2CocNIucqfqUryb2u0w-GiXnCp4Zd0oP53brYCicXQd52h/exec';
+      // Google Apps Script web app URL
+      const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNjPkm10_43X4zq4cTjm7GYTkA00NpX_T1P-4ZPFuDEQq8rhZRXBMYMq0Nxj2slKjm/exec';
       
       const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
         method: 'POST',
@@ -42,6 +54,8 @@ export default function HeroSection() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          firstName: firstName,
+          lastName: lastName,
           email: email,
           timestamp: new Date().toISOString(),
         })
@@ -51,6 +65,8 @@ export default function HeroSection() {
 
       if (result.success) {
         setSubmitStatus('success');
+        setFirstName('');
+        setLastName('');
         setEmail('');
       } else {
         setSubmitStatus('error');
@@ -168,65 +184,141 @@ export default function HeroSection() {
             SOMA senses anxiety and responds immediately with calming touch.
           </Typography>
 
-          {/* Email Form */}
+          {/* Signup Form */}
           <Box component="form" onSubmit={handleSubmit} sx={{ mb: 6 }}>
             <Stack 
-              direction={{ xs: 'column', sm: 'row' }} 
-              spacing={2}
+              direction="column" 
+              spacing={3}
               sx={{ 
                 maxWidth: 500,
                 mx: 'auto',
               }}
             >
-              <TextField
-                fullWidth
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={isSubmitting}
-                error={!!emailError}
-                helperText={emailError}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 3,
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(213, 184, 147, 0.2)',
-                    color: 'primary.contrastText',
-                    '& fieldset': {
-                      borderColor: 'transparent',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'rgba(213, 184, 147, 0.4)',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: emailError ? '#ef4444' : 'secondary.main',
-                    },
-                    '&.Mui-error fieldset': {
-                      borderColor: '#ef4444',
-                    },
-                    '& input': {
+              <Stack 
+                direction={{ xs: 'column', sm: 'row' }} 
+                spacing={2}
+              >
+                <TextField
+                  fullWidth
+                  type="text"
+                  placeholder="First name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 3,
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(213, 184, 147, 0.2)',
                       color: 'primary.contrastText',
-                      '&::placeholder': {
-                        color: 'secondary.main',
-                        opacity: 0.6,
+                      '& fieldset': {
+                        borderColor: 'transparent',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgba(213, 184, 147, 0.4)',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: 'secondary.main',
+                      },
+                      '& input': {
+                        color: 'primary.contrastText',
+                        '&::placeholder': {
+                          color: 'secondary.main',
+                          opacity: 0.6,
+                        },
                       },
                     },
-                  },
-                  '& .MuiFormHelperText-root': {
-                    color: '#ef4444',
-                    marginLeft: 0,
-                    marginRight: 0,
-                  },
-                }}
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                color="secondary"
-                disabled={isSubmitting || !email || !validateEmail(email)}
-                endIcon={<ArrowForwardIcon />}
+                  }}
+                />
+                <TextField
+                  fullWidth
+                  type="text"
+                  placeholder="Last name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 3,
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(213, 184, 147, 0.2)',
+                      color: 'primary.contrastText',
+                      '& fieldset': {
+                        borderColor: 'transparent',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgba(213, 184, 147, 0.4)',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: 'secondary.main',
+                      },
+                      '& input': {
+                        color: 'primary.contrastText',
+                        '&::placeholder': {
+                          color: 'secondary.main',
+                          opacity: 0.6,
+                        },
+                      },
+                    },
+                  }}
+                />
+              </Stack>
+              
+              <Stack 
+                direction={{ xs: 'column', sm: 'row' }} 
+                spacing={2}
+              >
+                <TextField
+                  fullWidth
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  error={!!emailError}
+                  helperText={emailError}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 3,
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(213, 184, 147, 0.2)',
+                      color: 'primary.contrastText',
+                      '& fieldset': {
+                        borderColor: 'transparent',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgba(213, 184, 147, 0.4)',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: emailError ? '#ef4444' : 'secondary.main',
+                      },
+                      '&.Mui-error fieldset': {
+                        borderColor: '#ef4444',
+                      },
+                      '& input': {
+                        color: 'primary.contrastText',
+                        '&::placeholder': {
+                          color: 'secondary.main',
+                          opacity: 0.6,
+                        },
+                      },
+                    },
+                    '& .MuiFormHelperText-root': {
+                      color: '#ef4444',
+                      marginLeft: 0,
+                      marginRight: 0,
+                    },
+                  }}
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                  disabled={isSubmitting || !firstName || !lastName || !email || !validateEmail(email)}
+                  endIcon={<ArrowForwardIcon />}
                 sx={{
                   px: 4,
                   py: 1.5,
@@ -246,6 +338,7 @@ export default function HeroSection() {
               >
                 {isSubmitting ? 'Joining...' : 'Join Waitlist'}
               </Button>
+              </Stack>
             </Stack>
           </Box>
 
