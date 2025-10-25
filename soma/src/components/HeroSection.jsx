@@ -48,7 +48,7 @@ export default function HeroSection() {
       // Google Apps Script web app URL
       const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFlP6Ddp6ln91uyVvyD79X0OrMzFYtIPZ1NLxpCwVSOckFAJmJojd08lewhBq416F7/exec';
       
-      // Use GET request with URL parameters to avoid CORS issues
+      // Use JSONP to avoid CORS issues
       const params = new URLSearchParams({
         firstName: firstName,
         lastName: lastName,
@@ -56,30 +56,48 @@ export default function HeroSection() {
         timestamp: new Date().toISOString(),
       });
       
-      const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?${params}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
+      // Create a script tag for JSONP
+      const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+      
+      return new Promise((resolve, reject) => {
+        // Create global callback function
+        window[callbackName] = (result) => {
+          delete window[callbackName];
+          document.body.removeChild(script);
+          
+          if (result.success) {
+            setSubmitStatus('success');
+            setFirstName('');
+            setLastName('');
+            setEmail('');
+          } else {
+            setSubmitStatus('error');
+            if (result.error === 'Email already exists') {
+              setEmailError('This email is already on our waitlist');
+            }
+          }
+          
+          setIsSubmitting(false);
+          resolve(result);
+        };
+        
+        // Create script tag
+        const script = document.createElement('script');
+        script.src = `${GOOGLE_APPS_SCRIPT_URL}?${params}&callback=${callbackName}`;
+        
+        script.onerror = () => {
+          delete window[callbackName];
+          document.body.removeChild(script);
+          setIsSubmitting(false);
+          setSubmitStatus('error');
+          reject(new Error('Request failed'));
+        };
+        
+        document.body.appendChild(script);
       });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setSubmitStatus('success');
-        setFirstName('');
-        setLastName('');
-        setEmail('');
-      } else {
-        setSubmitStatus('error');
-        if (result.error === 'Email already exists') {
-          setEmailError('This email is already on our waitlist');
-        }
-      }
     } catch (error) {
       console.error('Error submitting email:', error);
       setSubmitStatus('error');
-    } finally {
       setIsSubmitting(false);
     }
   };
