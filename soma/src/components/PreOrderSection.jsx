@@ -392,7 +392,7 @@ export default function FinalCTASection() {
               opacity: 0.7,
             }}
           >
-            Exclusive updates. No spam.
+            Launching soon. Be the first to try SOMA.
           </Typography>
         </Box>
       </Container>
