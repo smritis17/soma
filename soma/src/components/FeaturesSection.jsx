@@ -54,7 +54,7 @@ export default function ProblemSolutionSection() {
               mx: 'auto',
             }}
           >
-            Anxiety doesn't wait —<br />
+            Anxiety doesn't wait, <br />
             <Box 
               component="span" 
               sx={{ 

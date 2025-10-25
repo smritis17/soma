@@ -182,7 +182,7 @@ export default function FinalCTASection() {
               mx: 'auto',
             }}
           >
-            Be first to try SOMA —<br />
+            Be first to try SOMA<br />
             <Box 
               component="span" 
               sx={{ 
