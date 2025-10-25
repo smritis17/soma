@@ -65,7 +65,7 @@ export default function FinalCTASection() {
 
     try {
       // Google Apps Script web app URL
-      const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFlP6Ddp6ln91uyVvyD79X0OrMzFYtIPZ1NLxpCwVSOckFAJmJojd08lewhBq416F7/exec';
+      const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwzF-vz1W80j-2c1dk1wK0ZDZu7TugGBsRxVpi7hMCR8qLdZidPYv1aah-artHq9Y/exec';
       
       console.log('Submitting data to:', GOOGLE_APPS_SCRIPT_URL);
       console.log('Form data:', { firstName, lastName, email, timestamp: new Date().toISOString() });
